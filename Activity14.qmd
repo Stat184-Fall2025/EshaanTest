@@ -1,0 +1,108 @@
+---
+title: "Activity 14"
+author: "Eshaan Arakoni"
+date: "11/17/2025"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+editor: visual
+---
+
+## Front Matter
+
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(readxl)
+library(dcData)
+data(BabyNames)
+library(ggplot2)
+
+df <- read_excel("C:/Users/eshaa/Downloads/US_Armed_Forces_(6_2025).xlsx")
+```
+
+## Armed Forces Data Wrangling
+
+```{r}
+df_clean <- df[-c(1,2), ]
+
+df_clean <- df_clean %>%
+  rename(
+    Pay_Grade = `Active-Duty Personnel by Service Branch, Sex, and Pay Grade`,
+    Army_Male = ...2,
+    Army_Female = ...3,
+    Navy_Male = ...5,
+    Navy_Female = ...6,
+    Marine_Male = ...8,
+    Marine_Female = ...9,
+    Air_Male = ...11,
+    Air_Female = ...12,
+    Space_Male = ...14,
+    Space_Female = ...15
+  )
+
+df_clean <- df_clean %>%
+  mutate(across(-Pay_Grade, ~ as.numeric(.)))
+
+df_group <- df_clean %>%
+  pivot_longer(
+    cols = -Pay_Grade,
+    names_to = c("Service_Branch", "Sex"),
+    names_sep = "_",
+    values_to = "Count"
+  ) %>%
+  filter(!is.na(Count))
+
+df_individual <- df_group %>%
+  uncount(Count)
+
+```
+
+### Frequency Table
+
+```{r}
+df_individual %>%
+  count(Pay_Grade)
+
+```
+
+## Baby Names
+
+```{r}
+BN <- BabyNames |>
+  filter(name %in% c("Emma", "Noah", "Olivia", "Edith"))
+
+ggplot(data = BN,
+       mapping = aes(
+         x = year,
+         y = count,
+       )) + 
+  geom_line()
+       
+```
+
+I chose these four names, because they have been somewhat popular all the way from 1880 all the way till now. It is useful to see how the progression of the amount of children with these names there are.
+
+## Plotting Math Functions
+
+```{r}
+getVolume <- function(sideLength) {
+  vol <- sideLength * (8.5 - 2 * sideLength) * (11 - 2 * sideLength)
+  return(vol)
+}
+
+ggplot(data.frame(x = c(0,4)), aes(x=x)) + 
+         stat_function(fun = getVolume) + 
+         labs(
+           title = "Volume vs sideLength",
+           x = "sideLength", 
+           y = "Volume",
+         )
+         
+```
+
+## What I've learned so far
+
+This class has been a mixture of learning. I've learned a lot of the fundamentals of R coding better. I think that I am more confident in my ability to read and write R. Especially when it comes to data visualizations, I believe that I've improved vastly.
